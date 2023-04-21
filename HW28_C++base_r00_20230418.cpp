@@ -24,6 +24,8 @@ struct Man
 
 } man[row];
 
+void printDataF(int *p, string arrfname[]);
+
 void Data(Man* man)
 {
 	man[0] = { "Mirzahanyan",	"Edmund",		27, "1996.10.20", "BR211", "Devop" };
@@ -38,7 +40,7 @@ void fileList(Man man[], string  arrfname[])
 {
 	string fname = "file_";
 
-	cout << "\n  List of files:\n";
+	cout << "\n  DATA: list of files:\n";
 	for (int i = 0, j = 1; i < row; i++, j++)
 	{
 		string n{};
@@ -68,16 +70,12 @@ void fileList(Man man[], string  arrfname[])
 	}
 }
 
-int main()
+void fileFullExchange(string arrfname[])
 {
-	Data(man);
-	string arrfname[row]{};
-	fileList(man, arrfname);
-
-	//Menu
+	//Function for select files for exchange data
 restart1:
 	int qty = 0;
-	cout << "\n Qty of files for exchange: ";
+	cout << "\n Qty files : ";
 	cin >> qty;
 
 	if (qty > row || qty % 2 != 0)
@@ -100,17 +98,23 @@ restart1:
 		j++;
 	}
 
+	//Function: Full exchange data between Files
 
-	//Function of exchange data between Files
-	
 	int n = 0;
 	while (n < qty)
 	{
 		int x = 0, y = 0;
+		int* px = 0, * py = 0;
+
 		x = arr[n++];
 		y = arr[n++];
 		x--, y--;
+		px = &x, py = &y;
 
+		cout << "\n DATA BEFORE:";
+		printDataF(px, arrfname);
+		printDataF(py, arrfname);
+		
 		//move data File X -> File temp
 		ofstream fout_t;
 		fout_t.open("file_t.txt", ios::trunc);
@@ -191,7 +195,110 @@ restart1:
 		fout_y.close();
 
 		remove("file_t.txt");
+
+		cout << "\n DATA AFTER:";
+		printDataF(px, arrfname);
+		printDataF(py, arrfname);
+	}
+}
+
+void fileRowExchange(string arrfname[])
+{
+	//Function for select files for exchange data
+restart1:
+	int qty = 0;
+	cout << "\n Qty of files for exchange: ";
+	cin >> qty;
+
+	if (qty > row || qty % 2 != 0)
+	{
+		cout << "\n ERROR. incorrect input";
+		goto restart1;
 	}
 
+	int* arr = new int[qty];
+	int i = 0, j = 0;
+
+
+	while (i < qty)
+	{
+		cout << "\n File package N" << j + 1;
+		cout << "\n\t1-st file: Num -> ";
+		cin >> arr[(i++)];
+		cout << "\t2-nd file: Num -> ";
+		cin >> arr[(i++)];
+		j++;
+	}
+
+	//Function: Row exchange data between Files
+	int n = 0;
+	while (n < qty)
+	{
+		int x = 0, y = 0;
+		int* px = 0, * py = 0;
+
+		x = arr[n++];
+		y = arr[n++];
+		x--, y--;
+
+		px = &x;
+		py = &y;
+
+		printDataF(px, arrfname);
+		printDataF(py, arrfname);
+	}
+}
+
+int main()
+{
+	int num = 0;
+	Data(man);
+	string arrfname[row]{};
+	fileList(man, arrfname);
+
+	cout
+		<< "\n\tMenu:"
+		<< "\n\t1 - exchange Full data"
+		<< "\n\t2 - exchange Row data";
+	cout << "\n Operations: ";
+
+	cin >> num;
+	switch (num)
+	{
+	case 1: fileFullExchange(arrfname);
+		break;
+	case 2: fileRowExchange(arrfname);
+		break;
+	default: cout << "\n No operations. EXIT!!!";
+	}
+	
+
 	return 0;
+}
+
+//Overload functions
+//================================================//
+
+void printDataF(int *p, string arrfname[])
+{
+	ifstream fin;
+	fin.open(arrfname[*p]);
+	int i = 1;
+	if (!fin.is_open())
+	{
+		cout << "\n\tCannot open the file";
+	}
+	else
+	{
+		cout 
+			<< "\n\t" << (*p)%2+1 << ((*p)%2 == 0? "-st" : "-nd")
+			<< " File: " << arrfname[*p] << "\n";
+		while (!fin.eof())
+		{
+			string str{};
+			getline(fin, str);
+			cout << "\tRow " << i++ << " | " << str << "\n";
+		}
+	}
+	fin.close();
 }
