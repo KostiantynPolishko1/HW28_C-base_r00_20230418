@@ -29,7 +29,7 @@ void printDataF(int *p, string arrfname[]);
 void Data(Man* man)
 {
 	man[0] = { "Mirzahanyan",	"Edmund",		27, "1996.10.20", "BR211", "Devop" };
-	man[1] = { "Savoyskiy",		"Yaroslav",		17, "2004.04.19", "BR211", "Admin" };
+	man[1] = { "Savoyskiy",		"Yaro",			17, "2004.04.19", "BR211", "Admin" };
 	man[2] = { "Polishko",		"Kostiantyn",	38, "1985.02.06", "BR211", "Devop" };
 	man[3] = { "Kovalskiy",		"Oleg",			20, "2003.12.02", "BR211", "Admin" };
 	man[4] = { "Rymyanceva",	"Arina",		19, "2004.04.16", "BR211", "Devop" };
@@ -111,7 +111,7 @@ restart1:
 		x--, y--;
 		px = &x, py = &y;
 
-		cout << "\n DATA BEFORE:";
+		cout << "\n DATA of FILES BEFORE:";
 		printDataF(px, arrfname);
 		printDataF(py, arrfname);
 		
@@ -196,15 +196,18 @@ restart1:
 
 		remove("file_t.txt");
 
-		cout << "\n DATA AFTER:";
+		cout << "\n DATA of FILES AFTER:";
 		printDataF(px, arrfname);
 		printDataF(py, arrfname);
 	}
+
+	delete[] arr;
+	arr = nullptr;
 }
 
 void fileRowExchange(string arrfname[])
 {
-	//Function for select files for exchange data
+	//Create array of files for exchange data
 restart1:
 	int qty = 0;
 	cout << "\n Qty of files for exchange: ";
@@ -216,36 +219,117 @@ restart1:
 		goto restart1;
 	}
 
-	int* arr = new int[qty];
-	int i = 0, j = 0;
-
+	int fx = 0, fy = 0;
+	int i = 0, j = 1;
 
 	while (i < qty)
 	{
-		cout << "\n File package N" << j + 1;
+		cout << "\n File package N" << j++;
 		cout << "\n\t1-st file: Num -> ";
-		cin >> arr[(i++)];
+		cin >> fx;
+		i++;
 		cout << "\t2-nd file: Num -> ";
-		cin >> arr[(i++)];
-		j++;
-	}
+		cin >> fy;
+		i++;
 
-	//Function: Row exchange data between Files
-	int n = 0;
-	while (n < qty)
-	{
 		int x = 0, y = 0;
 		int* px = 0, * py = 0;
 
-		x = arr[n++];
-		y = arr[n++];
-		x--, y--;
+		fx--, fy--;
 
-		px = &x;
-		py = &y;
+		px = &fx;
+		py = &fy;
 
+		cout << "\n DATA of FILES BEFORE:";
 		printDataF(px, arrfname);
 		printDataF(py, arrfname);
+		//Create array of rows for exchange
+
+		{
+		restart2:
+			int qtyr = 0;
+			cout << "\n Qty rows for exchange: ";
+			cin >> qtyr;
+
+			if (qty > row || qty % 2 != 0)
+			{
+				cout << "\n ERROR. incorrect input";
+				goto restart2;
+			}
+
+			int* arrows = new int[qtyr];
+			int i2 = 0, j2 = 0;
+
+			cout << " Enter the numbers:\n";
+			while (i2 < qtyr)
+			{
+				cout << "\t\tRow ";
+				cin >> arrows[(i2++)];
+				j2++;
+			}
+
+			//Exchange data between rows
+			int n = 0;
+			fstream fiox, fioxt;
+			fstream fioy, fioyt;
+			fiox.open(arrfname[fx], ios::in | ios::out);
+			fioy.open(arrfname[fy], ios::in | ios::out);
+
+			/*fiox.open("fx_temp.txt", ios::out);
+			fioy.open("fy_temp.txt", ios::out);*/
+
+			if (!fiox.is_open() || !fioy.is_open())
+			{
+				cout << "\n\tCannot open the file";
+			}
+			else
+			{
+				int rown = 0;
+				while (!fiox.eof())
+				{
+					bool tf = false;
+					string strx{}, stry{};
+					getline(fiox, strx);
+					getline(fioy, stry);
+					rown++;
+
+					int n = 0;
+					while (n < j2)
+					{
+						if (rown == arrows[n])
+						{
+							tf = true;
+							break;
+						}
+						n++;
+					}
+					if (tf)
+					{
+						int posx = fiox.tellg();
+						int posy = fioy.tellg();
+
+						fiox.seekg(-fiox.tellg(), ios::cur);
+						fiox << stry << "\n";
+
+						fioy.seekg(-fioy.tellg(), ios::cur);
+						fioy << strx << "\n";
+
+						fiox.seekg(16, ios::beg);
+						fioy.seekg(20, ios::beg);	
+					}
+				}
+			}
+
+			fiox.close();
+			fioy.close();
+
+			delete[] arrows;
+			arrows = nullptr;
+
+			cout << "\n DATA of FILES AFTER:";
+			printDataF(px, arrfname);
+			printDataF(py, arrfname);
+		}
 	}
 }
 
@@ -272,7 +356,6 @@ int main()
 	default: cout << "\n No operations. EXIT!!!";
 	}
 	
-
 	return 0;
 }
 
