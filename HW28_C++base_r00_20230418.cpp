@@ -2,6 +2,7 @@
 #include <string>
 #include<fstream>
 #include<stdio.h>
+#include<Windows.h>
 
 using namespace std;
 
@@ -26,14 +27,16 @@ struct Man
 
 void printDataF(int *p, string arrfname[]);
 
+int checkV();
+
 void Data(Man* man)
 {
-	man[0] = { "Mirzahanyan",	"Edmund",		27, "1996.10.20", "BR211", "Devop" };
-	man[1] = { "Savoyskiy",		"Yaro",			17, "2004.04.19", "BR211", "Admin" };
-	man[2] = { "Polishko",		"Kostiantyn",	38, "1985.02.06", "BR211", "Devop" };
-	man[3] = { "Kovalskiy",		"Oleg",			20, "2003.12.02", "BR211", "Admin" };
-	man[4] = { "Rymyanceva",	"Arina",		19, "2004.04.16", "BR211", "Devop" };
-	man[5] = { "Borodina",		"Ganna",		21, "2002.05.08", "BR211", "Devop" };
+	man[0] = { "Mirzahany",		"Edmund",		27, "1996.10.20", "BR211", "Devop" };
+	man[1] = { "Savoyskiy",		"Yarosl",		17, "2004.04.19", "BR211", "Admin" };
+	man[2] = { "Polishkoi",		"Kostia",		38, "1985.02.06", "BR211", "Devop" };
+	man[3] = { "Kovalskiy",		"Olegov",		20, "2003.12.02", "BR211", "Admin" };
+	man[4] = { "Rymyancev",		"Arinan",		19, "2004.04.16", "BR211", "Devop" };
+	man[5] = { "Borodinan",		"Gannan",		21, "2002.05.08", "BR211", "Devop" };
 }
 
 void fileList(Man man[], string  arrfname[])
@@ -76,11 +79,12 @@ void fileFullExchange(string arrfname[])
 restart1:
 	int qty = 0;
 	cout << "\n Qty files : ";
-	cin >> qty;
+	qty = checkV();
 
 	if (qty > row || qty % 2 != 0)
 	{
-		cout << "\n ERROR. incorrect input";
+		cout << "\n !ERROR! Uncorrect input";
+		cout << "\n Input pair number & <= " << row;
 		goto restart1;
 	}
 
@@ -92,9 +96,9 @@ restart1:
 	{
 		cout << "\n File package N" << j + 1;
 		cout << "\n\t1-st file: Num -> ";
-		cin >> arr[(i++)];
+		arr[(i++)] = checkV();
 		cout << "\t2-nd file: Num -> ";
-		cin >> arr[(i++)];
+		arr[(i++)] = checkV();
 		j++;
 	}
 
@@ -131,6 +135,8 @@ restart1:
 		}
 		else
 		{
+			int pos = 0;
+
 			while (!fin_x.eof())
 			{
 				string str{};
@@ -196,6 +202,8 @@ restart1:
 
 		remove("file_t.txt");
 
+		system("CLS");
+
 		cout << "\n DATA of FILES AFTER:";
 		printDataF(px, arrfname);
 		printDataF(py, arrfname);
@@ -211,11 +219,12 @@ void fileRowExchange(string arrfname[])
 restart1:
 	int qty = 0;
 	cout << "\n Qty of files for exchange: ";
-	cin >> qty;
+	qty = checkV();
 
 	if (qty > row || qty % 2 != 0)
 	{
-		cout << "\n ERROR. incorrect input";
+		cout << "\n !ERROR! Uncorrect input";
+		cout << "\n Input pair number & <= " << row;
 		goto restart1;
 	}
 
@@ -226,10 +235,10 @@ restart1:
 	{
 		cout << "\n File package N" << j++;
 		cout << "\n\t1-st file: Num -> ";
-		cin >> fx;
+		fx = checkV();
 		i++;
 		cout << "\t2-nd file: Num -> ";
-		cin >> fy;
+		fy = checkV();
 		i++;
 
 		int x = 0, y = 0;
@@ -243,17 +252,19 @@ restart1:
 		cout << "\n DATA of FILES BEFORE:";
 		printDataF(px, arrfname);
 		printDataF(py, arrfname);
+
 		//Create array of rows for exchange
 
 		{
 		restart2:
 			int qtyr = 0;
 			cout << "\n Qty rows for exchange: ";
-			cin >> qtyr;
+			qtyr = checkV();
 
-			if (qty > row || qty % 2 != 0)
+			if (qty > 5 || qty == 0)
 			{
-				cout << "\n ERROR. incorrect input";
+				cout << "\n !ERROR! Uncorrect input";
+				cout << "\n Input number > 0 & <= " << 5;
 				goto restart2;
 			}
 
@@ -264,7 +275,7 @@ restart1:
 			while (i2 < qtyr)
 			{
 				cout << "\t\tRow ";
-				cin >> arrows[(i2++)];
+				arrows[(i2++)] = checkV();
 				j2++;
 			}
 
@@ -274,9 +285,6 @@ restart1:
 			fstream fioy, fioyt;
 			fiox.open(arrfname[fx], ios::in | ios::out);
 			fioy.open(arrfname[fy], ios::in | ios::out);
-
-			/*fiox.open("fx_temp.txt", ios::out);
-			fioy.open("fy_temp.txt", ios::out);*/
 
 			if (!fiox.is_open() || !fioy.is_open())
 			{
@@ -314,8 +322,8 @@ restart1:
 						fioy.seekg(-fioy.tellg(), ios::cur);
 						fioy << strx << "\n";
 
-						fiox.seekg(16, ios::beg);
-						fioy.seekg(20, ios::beg);	
+						fiox.seekg(fioy.tellg(), ios::beg);
+						fioy.seekg(fiox.tellg(), ios::beg);
 					}
 				}
 			}
@@ -325,6 +333,8 @@ restart1:
 
 			delete[] arrows;
 			arrows = nullptr;
+
+			system("CLS");
 
 			cout << "\n DATA of FILES AFTER:";
 			printDataF(px, arrfname);
@@ -344,16 +354,22 @@ int main()
 		<< "\n\tMenu:"
 		<< "\n\t1 - exchange Full data"
 		<< "\n\t2 - exchange Row data";
+
+restart0:
 	cout << "\n Operations: ";
 
-	cin >> num;
+	num = checkV();
 	switch (num)
 	{
 	case 1: fileFullExchange(arrfname);
 		break;
 	case 2: fileRowExchange(arrfname);
 		break;
-	default: cout << "\n No operations. EXIT!!!";
+	default: 
+		{
+			cout << "\n !ERROR! Uncorrect input..";
+			goto restart0;
+		}
 	}
 	
 	return 0;
@@ -384,4 +400,26 @@ void printDataF(int *p, string arrfname[])
 		}
 	}
 	fin.close();
+}
+
+int checkV()
+{
+	int a;
+	while (true) // the cycle continues until the user enters the correct value
+	{
+		cin >> a;
+		if (cin.fail()) // if the previous extraction was unsuccessful,
+		{
+			cout << " Uncorrect input. Enter int value: ";
+			cin.clear(); // then return the cin to 'normal' mode of operation
+			cin.ignore(32767, '\n'); // and remove the previous input values from the input buffer
+		}
+		else // if all is well, return a
+		{
+			cin.ignore(32767, '\n'); // and remove the previous input values from the input buffer
+			return abs(a);
+		}
+	}
+
+	return 0;
 }
