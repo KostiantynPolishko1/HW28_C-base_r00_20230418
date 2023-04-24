@@ -3,11 +3,12 @@
 #include<fstream>
 #include<stdio.h>
 #include<Windows.h>
+#include <cstdlib>
 
 using namespace std;
 
-//Ќаписать программу котора€ будет мен€ть данные двух и более файлов между собой.
-//ƒать пользователю возможность выбирать какие данные в каких файлах нужно помен€ть между собой.
+//Write a programme that exchanges data between two or more files.
+//Allow the user to choose which data in which files should be swapped between them.
 
 const int row = 6;
 
@@ -73,11 +74,10 @@ void fileList(Man man[], string  arrfname[])
 	}
 }
 
-void fileFullExchange(string arrfname[])
+int *fillArrFiles(int &qty)
 {
-	//Function for select files for exchange data
 restart1:
-	int qty = 0;
+
 	cout << "\n Qty files : ";
 	qty = checkV();
 
@@ -102,9 +102,19 @@ restart1:
 		j++;
 	}
 
+	return arr;
+}
+
+void fileFullExchange(string arrfname[])
+{
+	//Function for select files for exchange data
+	int* arr = 0, qty = 0;
+	arr = fillArrFiles(qty);
+
 	//Function: Full exchange data between Files
 
 	int n = 0;
+restart3:
 	while (n < qty)
 	{
 		int x = 0, y = 0;
@@ -119,6 +129,18 @@ restart1:
 		printDataF(px, arrfname);
 		printDataF(py, arrfname);
 		
+		char ch{};
+		cout << "\n Confirm: Y - YES / N - NO";
+		cout << "\n Enter Y/N: ";
+		cin >> ch;
+		if (ch == 'N' || ch == 'n')
+		{
+			cout << "\n !CHANGES CANCELLED!";
+			goto restart3;
+		}
+
+		//Exchange data between files
+		// 
 		//move data File X -> File temp
 		ofstream fout_t;
 		fout_t.open("file_t.txt", ios::trunc);
@@ -231,6 +253,7 @@ restart1:
 	int fx = 0, fy = 0;
 	int i = 0, j = 1;
 
+restart3:
 	while (i < qty)
 	{
 		cout << "\n File package N" << j++;
@@ -277,6 +300,16 @@ restart1:
 				cout << "\t\tRow ";
 				arrows[(i2++)] = checkV();
 				j2++;
+			}
+
+			char ch{};
+			cout << "\n Confirm : y - YES / n - NO";
+			cout << "\n Enter Y/N: ";
+			cin >> ch;
+			if (ch == 'N' || ch == 'n')
+			{
+				cout << "\n\t!CHANGES CANCELLED!";
+				goto restart3;
 			}
 
 			//Exchange data between rows
